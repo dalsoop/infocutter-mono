@@ -88,7 +88,7 @@ MCP 서버로 연결하려면 `apps/browser/mcp`에서 `npm install` 후 `node s
 
 ### Android 릴리스 빌드
 
-릴리스 서명 설정(`android/key.properties`와 keystore)은 저장소 밖 비밀 저장소에서 빌드 직전에 만든다. 두 파일은 gitignore 대상이며 커밋하지 않는다.
+릴리스 서명 설정(`android/key.properties`와 keystore)은 저장소 밖 비밀 저장소에서 빌드 직전에 만든다. 두 파일은 gitignore 대상이며 커밋하지 않는다. 이 파일을 만드는 `tools/materialize-signing.sh`에는 비밀 저장소 위치의 기본값이 없다. 위치는 실행 환경에서 넘겨야 하고, 빠지면 스크립트가 이유를 출력하고 멈춘다. 저장소 위치 값을 스크립트나 문서에 적지 않는다.
 
 ```sh
 cd apps/browser
