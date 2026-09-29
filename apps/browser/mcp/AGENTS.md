@@ -1,0 +1,24 @@
+# apps/browser/mcp: 인포커터 자동화 MCP 서버
+
+## 범위
+
+stdio JSON-RPC로 동작하는 MCP 서버 `infocutter-automation`이다. MCP 도구 호출을 Flutter 앱 디버그 빌드의 자동화 브리지(`POST /run`)로 옮기고, 앱 상태 스냅샷을 리소스로 노출한다. 파일은 `index.mjs`(서버)와 `smoke.mjs`(끝에서 끝까지 확인) 둘이다.
+
+이 디렉터리가 맡지 않는 것: 브리지 동작 자체(앱의 `lib/services/app_automation_*`), 위험 등급 판정(앱이 한다), 앱 실행.
+
+## 불변 조건
+
+- 브리지 주소와 토큰은 환경 변수 `INFOCUTTER_BRIDGE_URL`(기본 `http://127.0.0.1:47821`), `INFOCUTTER_AUTOMATION_TOKEN`에서만 읽는다. 토큰 값을 코드나 README 예시에 적지 않는다.
+- 이 서버는 권한 검사를 하지 않는다. 위험 등급 동작의 차단은 앱 브리지가 한다. 서버 쪽에서 토큰 없이 위험 동작을 우회해 실행하는 경로를 만들지 않는다.
+- 도구 이름(`snapshot`, `new_tab`, `navigate`, `wait_for_load`, `wait_for_selector`, `click`, `fill`, `get_text`, `eval_js`, `screenshot`, `infocutter_pick`, `infocutter_open_panel`, `infocutter_add_block_rule`, `infocutter_list_profiles`, `run`)은 사용자 MCP 설정과 프롬프트가 기대는 계약이다. 이름을 바꾸지 말고 새로 추가한다.
+- 각 도구는 `toAction`에서 브리지 동작 이름(`page.load`, `infocutter.pick` 등)으로 바뀐다. 앱의 동작 이름이 바뀌면 이 표를 같은 변경에서 고친다.
+
+## 구현 방식
+
+- 의존성은 `@modelcontextprotocol/sdk` 하나이고 Node 18 이상의 전역 `fetch`를 쓴다.
+- `package-lock.json`과 `node_modules/`는 gitignore 대상이라 설치마다 SDK 버전이 `^1.0.0` 범위에서 달라질 수 있다.
+
+## 테스트
+
+- 자동 테스트는 없다. 앱을 `flutter run -d <기기> --debug`로 띄운 뒤 이 디렉터리에서 `npm install`, `node smoke.mjs`를 돌려 `SMOKE PASS`가 나오는지 확인한다.
+- 앱을 토큰 없이 띄웠으면 `eval_js`, `screenshot`은 403이 나는 것이 정상이다. 토큰을 넣은 앱과 같은 토큰을 환경 변수로 넘기면 통과해야 한다.
