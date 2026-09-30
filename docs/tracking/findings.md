@@ -1,5 +1,12 @@
 # 미해결 문제
 
+## Android 릴리스 서명 값이 두 곳에 있다
+
+- 증상: 2026-09-30 업로드 키스토어와 비밀번호의 정본을 퇴역한 Infisical에서 principal-secrets-mono로 옮겼다. 복호화 권한은 사람 복구 키와 MacBook 장비 키뿐이라 `tools/materialize-signing.sh`는 MacBook에서만 동작한다. 한편 `apps/browser/.github/workflows/main.yml`은 GitHub Actions secret(`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS`)으로 `key.properties`를 만든다. 이 파일은 저장소 루트의 `.github/`가 아니라서 GitHub가 실행하지 않는다.
+- 영향: GitHub secret 사본이 남아 있다면 정본과 따로 낡는다. CI에서 릴리스를 서명할 수 없다.
+- 지금 못 고치는 이유: GitHub secret이 실제로 설정되어 있는지 이 저장소에서 확인할 수 없고, CI 서명을 둘지는 소유자가 정해야 한다.
+- 방향: CI 서명을 쓰지 않으면 워크플로의 서명 단계와 GitHub secret을 지운다. 쓰려면 정본에서 배달하는 경로를 정한다.
+
 ## `npm ci`가 커밋된 lock 파일로 실패한다
 
 - 증상: 깨끗한 checkout의 `extensions/chrome`에서 `npm ci`를 돌리면 `Missing: @vibecode/ext-build@0.1.0 from lock file`로 끝난다. 2026-09-30 재현.
