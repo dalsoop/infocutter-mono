@@ -88,7 +88,12 @@ MCP 서버로 연결하려면 `apps/browser/mcp`에서 `npm install` 후 `node s
 
 ### Android 릴리스 빌드
 
-릴리스 서명 설정(`android/key.properties`와 keystore)은 저장소 밖 비밀 저장소에서 빌드 직전에 만든다. 두 파일은 gitignore 대상이며 커밋하지 않는다. 이 파일을 만드는 `tools/materialize-signing.sh`에는 비밀 저장소 위치의 기본값이 없다. 위치는 실행 환경에서 넘겨야 하고, 빠지면 스크립트가 이유를 출력하고 멈춘다. 저장소 위치 값을 스크립트나 문서에 적지 않는다.
+릴리스 서명 설정(`android/key.properties`와 keystore)은 저장소 밖 비밀 저장소에서 빌드 직전에 만든다. 두 파일은 gitignore 대상이며 커밋하지 않는다. 서명 값의 정본은 비공개 저장소 principal-secrets-mono(SOPS + age)이고, `tools/materialize-signing.sh`가 그 체크아웃에서 `sops --decrypt --extract`로 읽는다. 체크아웃 경로는 환경 변수 `PRINCIPAL_SECRETS_ROOT`로 넘기며 기본값이 없다. age 식별자 파일은 `SOPS_AGE_KEY_FILE`(기본 `~/.config/sops/age/macbook-se.txt`)이다. `sops`, 식별자 파일, 암호문 중 하나라도 없으면 스크립트가 이유를 출력하고 멈춘다. 예전에 쓰던 Infisical은 퇴역했으므로 `INFISICAL_SIGNING_*` 변수는 더 이상 쓰지 않는다.
+
+```sh
+cd apps/browser
+PRINCIPAL_SECRETS_ROOT=<principal-secrets-mono 체크아웃> tools/materialize-signing.sh
+```
 
 ```sh
 cd apps/browser
